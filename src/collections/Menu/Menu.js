@@ -14,7 +14,6 @@ import {
   useValueAndKey,
   useWidthProp,
 } from '../../lib'
-import { createShorthand } from '../../factories'
 import MenuHeader from './MenuHeader'
 import MenuItem from './MenuItem'
 import MenuMenu from './MenuMenu'
@@ -67,7 +66,7 @@ class Menu extends Component {
     /** A vertical menu may take the size of its container. */
     fluid: PropTypes.bool,
 
-    /** A menu may have labeled icons. */
+    /** A menu may have just icons (bool) or labeled icons. */
     icon: PropTypes.oneOfType([
       PropTypes.bool,
       PropTypes.oneOf(['labeled']),
