@@ -67,6 +67,8 @@ export default class ComponentProps extends Component {
     const params = _.filter(item.tags, { title: 'param' })
     const paramSignature = params
       .map(param => `${param.name}: ${param.type.name}`)
+      // prevent object properties from showing as individual params
+      .filter(p => !p.includes('.'))
       .join(', ')
 
     const paramDescriptions = params.map(param => (
