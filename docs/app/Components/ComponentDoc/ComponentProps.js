@@ -1,12 +1,28 @@
 import _ from 'lodash'
 import React, { Component, PropTypes } from 'react'
 
-import { Icon, Popup, Table } from 'src'
+import { Header, Icon, Popup, Table } from 'src'
 import { SUI } from 'src/lib'
 
-const descriptionExtraStyle = {
-  fontSize: '0.95em',
-  color: '#777',
+const extraDescriptionStyle = {
+  color: '#666',
+}
+const extraDescriptionContentStyle = {
+  marginLeft: '0.5em',
+}
+
+const Extra = ({ title, children, inline, ...rest }) => (
+  <div {...rest} style={extraDescriptionStyle}>
+    <strong>{title}</strong>
+    <div style={{ ...extraDescriptionContentStyle, display: inline ? 'inline' : 'block' }}>
+      {children}
+    </div>
+  </div>
+)
+Extra.propTypes = {
+  children: PropTypes.node,
+  inline: PropTypes.bool,
+  title: PropTypes.node,
 }
 
 /**
@@ -71,20 +87,21 @@ export default class ComponentProps extends Component {
       .filter(p => !p.includes('.'))
       .join(', ')
 
-    const paramDescriptions = params.map(param => (
-      <div style={{ color: '#888' }} key={param.name}>
-        <strong>{param.name}</strong> - {param.description}
+    const paramDescriptionRows = params.map(param => (
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div key={param.name} style={{ flex: '2 2 0', padding: '0.1em 0' }}>
+          <code>{param.name}</code>
+        </div>
+        <div key={`${param.name}-description`} style={{ flex: '5 5 0', padding: '0.1em 0' }}>
+          {param.description}
+        </div>
       </div>
     ))
 
-    const signature = <pre><code>{item.name}({paramSignature})</code></pre>
-
     return (
-      <div>
-        <strong>Signature:</strong>
-        {signature}
-        {paramDescriptions}
-      </div>
+      <Extra title={<pre>{item.name}({paramSignature})</pre>}>
+        {paramDescriptionRows}
+      </Extra>
     )
   }
 
@@ -100,7 +117,7 @@ export default class ComponentProps extends Component {
     if (item.type !== '{enum}') return
 
     const { showEnumsFor } = this.state
-    const truncateAt = 30
+    const truncateAt = 10
 
     if (!item.value) return null
 
@@ -108,37 +125,37 @@ export default class ComponentProps extends Component {
       return accumulator.concat(this.expandEnums(_.trim(v.value || v, '.\'')))
     }, [])
 
+    const valueElements = _.map(values, val => <span key={val}><code>{val}</code> </span>)
+
     // show all if there are few
     if (values.length < truncateAt) {
       return (
-        <p style={descriptionExtraStyle}>
-          <strong>Enums: </strong> {values.join(', ')}
-        </p>
+        <Extra title='Enums:' inline>
+          {valueElements}
+        </Extra>
       )
     }
 
     // add button to show more when there are many values and it is not toggled
     if (!showEnumsFor[item.name]) {
       return (
-        <p style={descriptionExtraStyle}>
-          <strong>Enums: </strong>
+        <Extra title='Enums:' inline>
           <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(item.name)}>
             Show all {values.length}
           </a>
-          <div>{values.slice(0, truncateAt - 1).join(', ')}...</div>
-        </p>
+          <div>{valueElements.slice(0, truncateAt - 1)}...</div>
+        </Extra>
       )
     }
 
     // add "show more" button when there are many
     return (
-      <p style={descriptionExtraStyle}>
-        <strong>Enums: </strong>
+      <Extra title='Enums:' inline>
         <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(item.name)}>
           Show less
         </a>
-        <div>{values.join(', ')}</div>
-      </p>
+        <div>{valueElements}</div>
+      </Extra>
     )
   }
 
@@ -149,9 +166,7 @@ export default class ComponentProps extends Component {
         <Table.Cell>{this.renderDefaultValue(item)}</Table.Cell>
         <Table.Cell>{item.type}</Table.Cell>
         <Table.Cell>
-          {item.description && (
-            <p>{item.description}</p>
-          )}
+          {item.description && <p>{item.description}</p>}
           {this.renderFunctionSignature(item)}
           {this.renderEnums(item)}
         </Table.Cell>
@@ -184,7 +199,7 @@ export default class ComponentProps extends Component {
     }), 'name')
 
     return (
-      <Table compact basic='very'>
+      <Table compact='very' basic='very'>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
