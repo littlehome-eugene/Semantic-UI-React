@@ -88,11 +88,11 @@ export default class ComponentProps extends Component {
       .join(', ')
 
     const paramDescriptionRows = params.map(param => (
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div key={param.name} style={{ flex: '2 2 0', padding: '0.1em 0' }}>
+      <div key={param.name} style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ flex: '2 2 0', padding: '0.1em 0' }}>
           <code>{param.name}</code>
         </div>
-        <div key={`${param.name}-description`} style={{ flex: '5 5 0', padding: '0.1em 0' }}>
+        <div style={{ flex: '5 5 0', padding: '0.1em 0' }}>
           {param.description}
         </div>
       </div>
